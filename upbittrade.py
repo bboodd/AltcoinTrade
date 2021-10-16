@@ -9,7 +9,7 @@ coinlist = ["KRW-HUM", "KRW-STPT", "KRW-XEC", "KRW-DOT", "KRW-QKC", "KRW-MLK", "
 
 def get_target_price(ticker, k):
     """변동성 돌파 전략으로 매수 목표가 조회"""
-    df = pyupbit.get_ohlcv(ticker, interval="minute60", count=5)
+    df = pyupbit.get_ohlcv(ticker, interval="minute60", count=2)
     target_price = df.iloc[0]['close'] + (df.iloc[0]['high'] - df.iloc[0]['low']) * k
     return target_price
 def get_start_time(ticker):
@@ -43,8 +43,8 @@ while True:
             now = datetime.datetime.now()
             start_time = get_start_time("KRW-BTC")
             end_time = start_time + datetime.timedelta(minutes=60)
-            if start_time < now < end_time - datetime.timedelta(seconds=10):
-                target_price = get_target_price(i, 0.5)
+            if start_time < now < end_time - datetime.timedelta(seconds=20):
+                target_price = get_target_price(i, 0.65)
                 current_price = pyupbit.get_current_price(i)
                 if target_price < current_price:
                     krw = get_balance("KRW")
@@ -53,7 +53,7 @@ while True:
             else:
                 rc = upbit.get_balance(i)
                 if rc > 0.00008:
-                    upbit.sell_market_order(i, i*0.9995)
+                    upbit.sell_market_order(i, rc*0.9995)
             time.sleep(1)
         except Exception as e:
             print(e)
